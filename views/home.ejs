@@ -1,0 +1,102 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Form</title>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h1>Socket.IO Form</h1>
+
+    <form id="messageForm">
+      <label for="message">Enter Message:</label>
+      <input type="text" id="message" name="message" required />
+      <button type="submit">Send Message</button>
+    </form>
+
+    <div id="messagesContainer"></div>
+
+    <script>
+      const socket = io("http://localhost:3008");
+
+      const messageForm = document.getElementById("messageForm");
+      const messageInput = document.getElementById("message");
+      const messagesContainer = document.getElementById("messagesContainer");
+
+      messageForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const message = messageInput.value;
+        socket.emit("message", { message });
+        messageInput.value = "";
+      });
+
+      // Handle incoming messages
+      socket.on("message", (data) => {
+        const newMessage = document.createElement("p");
+        newMessage.textContent = data.message;
+        messagesContainer.appendChild(newMessage);
+      });
+    </script>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script> -->
+
+    <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script>
+  </head>
+  <body>
+    <input type="text" class="message" /><br />
+
+    <button onClick="sendMessage()">submit</button>
+    <h1></h1>
+    <input type="file" id="fileInput" />
+    <button id="sendFileButton">Send File</button>
+    <script>
+      const socket = io("http://localhost:3008");
+      // const socket = io("http://yoneapi.developmentrecords.com");
+
+      const fileInput = document.getElementById("fileInput");
+      const sendFileButton = document.getElementById("sendFileButton");
+
+      sendFileButton.addEventListener("click", () => {
+        const file = fileInput.files[0];
+        if (file) {
+          // Send the file to the server
+          // Use socket.emit to send the file
+          socket.emit("file", { file });
+        }
+      });
+
+      socket.emit("typing", () => {
+        console.log("typing");
+      });
+      socket.on("connect", () => {
+        console.log("Connected to server!");
+      });
+
+      socket.on("message", (data) => {
+        document.querySelector("h1").innerHTML = data;
+        console.log(data);
+      });
+      const sendMessage = () => {
+        const messageinput = document.querySelector(".message");
+        const message = messageinput.value;
+        socket.emit("message", {
+          senderId: "65a7ab916ed41bdf19c191e5",
+          receiverId: "65a77a10569e961845d2c0cb",
+          message: message,
+          senderRole: "user",
+        });
+      };
+    </script>
+  </body>
+</html>

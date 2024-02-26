@@ -1,0 +1,81 @@
+ const { email, phone, username } = req.body;
+// Check if email, phone, or username already exists
+const existingUser = await userModel.findOne({
+  $or: [
+    { email: email },
+    { phone: phone },
+    { username: username.toLowerCase() }
+  ]
+});
+
+if (existingUser) {
+  const response = {
+    status: 400,
+    message: 'User creation failed',
+    data: {}
+  };
+
+  // Check which fields already exist and include separate messages
+  if (existingUser.email === email) {
+    response.message += ': Email already exists';
+    response.data.emailExists = true;
+  }
+
+  if (existingUser.phone === phone) {
+    response.message += ': Phone already exists';
+    response.data.phoneExists = true;
+  }
+
+  if (existingUser.username === username.toLowerCase()) {
+    response.message += ': Username already exists';
+    response.data.usernameExists = true;
+  }
+
+  return res.status(400).send(response);
+}
+
+// Continue with user creation logic
+// ...
+
+/////////////////////convert to english ////////////////////////////////
+const translate = require('google-translate-api');
+
+function analyzeBookingIntent(message) {
+  // Translate the message to English
+  return translate(message, { to: 'en' })
+    .then((translation) => {
+      const englishMessage = translation.text;
+      return analyzeBookingIntentEnglish(englishMessage);
+    })
+    .catch((error) => {
+      console.error('Translation error:', error);
+      return false;
+    });
+}
+
+function analyzeBookingIntentEnglish(message) {
+  const bookingKeywords = ['meet', 'available', 'date', 'time', 'location'];
+  for (const keyword of bookingKeywords) {
+    if (message.toLowerCase().includes(keyword)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Example usage
+const messages = [
+  "Let's meet on Friday.",
+  "Estoy disponible el sábado por la tarde.",
+  // Add messages in other languages as needed
+];
+
+for (const message of messages) {
+  analyzeBookingIntent(message)
+    .then((hasBookingIntent) => {
+      console.log(`Message: "${message}" - Booking Intent: ${hasBookingIntent}`);
+    })
+    .catch((error) => {
+      console.error('Analysis error:', error);
+    });
+}
